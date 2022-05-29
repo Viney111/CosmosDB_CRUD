@@ -11,13 +11,15 @@ from flask import Flask, request, make_response
 from flask_restful import Api
 from werkzeug.exceptions import HTTPException, Aborter
 import json
-from cosmos_SQL_API_crud import azure_cosmosdb_SQL_CRUD
+# from cosmos_SQL_API_crud import azure_cosmosdb_SQL_CRUD
+from cosmos_Mongo_API_crud import azure_cosmosdb_MONGO_CRUD
 
 
 # Initializing Flask for implementing API
 app = Flask(__name__)
 api = Api(app)
-crud_azure = azure_cosmosdb_SQL_CRUD()
+# crud_azure = azure_cosmosdb_SQL_CRUD()
+crud_azure = azure_cosmosdb_MONGO_CRUD()
 abort = Aborter()
 
 
