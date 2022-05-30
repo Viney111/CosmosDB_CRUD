@@ -23,7 +23,7 @@ crud_azure = azure_cosmosdb_MONGO_CRUD()
 abort = Aborter()
 
 
-@app.route("/emp_data", methods=['GET'])
+@app.route("/empdata", methods=['GET'])
 def get():
     """
         Description: This function is to retrieve data from Specified URL
@@ -37,7 +37,25 @@ def get():
         print(ex)
 
 
-@app.route("/emp_data", methods=['POST'])
+@app.route("/empdata/<string:emp_id>", methods=['GET'])
+def get_by_id(emp_id):
+    """
+        Description: This function is to retrieve data from Specified URL with employee ID
+        Parameters: None, just defined router path.
+        Returns: A dictionary of requested data and response code to client
+    """
+    try:
+        supporting_data = crud_azure.reading_data_by_ID(emp_id)
+        if supporting_data is None:
+            abort(404, description="ID is not valid, Please enter correct ID")
+        return make_response({"emp" :supporting_data}, 200)
+    except HTTPException as ex:
+        return handle_exception(ex)
+    except Exception as ex:
+        print(ex)
+
+
+@app.route("/empdata", methods=['POST'])
 def post():
     """
         Description: This function is to post data to MSSQL Database
@@ -52,7 +70,7 @@ def post():
     else:
         return make_response("Posted Successfully", 201)
 
-@app.route("/emp_data/<string:emp_id>", methods=['DELETE'])
+@app.route("/empdata/<string:emp_id>", methods=['DELETE'])
 def delete(emp_id):
     """
         Description: This function is to delete data from AzureCosmosDb
@@ -69,6 +87,28 @@ def delete(emp_id):
         print(ex)
     else:
         return make_response("Deleted Successfully", 202)
+    
+
+
+@app.route("/empdata", methods=['PATCH'])
+def update():
+    """
+        Description: This function is to update data to AzureCosmosDb
+        Parameters: None
+        Returns: A descriptive message of updating(if id exists) and response code to client
+    """
+    updated_data = json.loads(request.data)
+    print(updated_data)
+    try:
+        update_msg = crud_azure.updating_data_by_id(updated_data)
+        if update_msg is None:
+            abort(404, description="ID is not valid, Please enter correct ID")
+    except HTTPException as ex:
+        return handle_exception(ex)
+    except Exception as ex:
+        print(ex)
+    else:
+        return make_response("Updated Successfully", 202)
 
           
 @app.errorhandler(HTTPException)
